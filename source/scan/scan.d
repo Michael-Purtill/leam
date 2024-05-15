@@ -80,6 +80,7 @@ Token[] scanner(char[] source) {
       continue;
     }
 
+    // Strings:
     if (ch == '"' || ch == '\'') {
       // we are in a string.
       i += 1;
@@ -92,6 +93,8 @@ Token[] scanner(char[] source) {
       i += strTokenLength + 1;
       continue;
     }
+
+    // Identifiers:
 
     if (matchFirst("%c".format(ch), r"[a-zA-Z]")) {
       // We are in an id or a keyword.``
@@ -109,6 +112,7 @@ Token[] scanner(char[] source) {
       continue;
     }
 
+    // Numbers:
     if (matchFirst("%c".format(ch), r"[0-9]")) {
       auto numTuple = scanNumber(source[i .. $], lineNo, charNo);
       int numTokenLength = numTuple[0];
@@ -120,6 +124,7 @@ Token[] scanner(char[] source) {
       continue;
     }
 
+    // assignment and comparison
     if (ch == '=' || ch == '<' || ch == '>') {
       char nextCh = source[i + 1];
 
@@ -130,6 +135,11 @@ Token[] scanner(char[] source) {
         continue;
       }
     }
+
+    // Everything else which doesn't require special rules
+    tokenStream ~= new Token(TokenTypeMap["%c".format(ch)], "", lineNo, charNo);
+
+    i += 1;
   }
 
   return tokenStream;
