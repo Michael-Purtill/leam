@@ -1,0 +1,16 @@
+.dub
+docs.json
+__dummy.html
+docs/
+/leam
+leam.so
+leam.dylib
+leam.dll
+leam.a
+leam.lib
+leam-test-*
+*.exe
+*.pdb
+*.o
+*.obj
+*.lst

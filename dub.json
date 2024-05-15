@@ -1,0 +1,9 @@
+{
+	"authors": [
+		"caterpillar"
+	],
+	"copyright": "Copyright © 2024, caterpillar",
+	"description": "A minimal D application.",
+	"license": "Apache-2.0",
+	"name": "leam"
+}
