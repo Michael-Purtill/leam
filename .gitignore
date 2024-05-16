@@ -3,6 +3,7 @@ docs.json
 __dummy.html
 docs/
 /leam
+test-output.txt
 leam.so
 leam.dylib
 leam.dll

@@ -1,5 +1,6 @@
 module scan.types.token;
 import std.format;
+import std.conv;
 
 enum TokenType {
   // Arithmetic and Logic
@@ -111,10 +112,10 @@ class Token {
   }
 
   override string toString() {
-    return "type:\t\t%d\n
-                value:\t\t%s\n
-                line:\t\t%d\n
-                char:\t\t%d\n
-                ".format(this.type, this.value, this.lineNum, this.charIndex);
+    return "type:\t\t%s\n
+            value:\t\t%s\n
+            line:\t\t%d\n
+            char:\t\t%d\n
+            ".format(to!string(this.type), this.value, this.lineNum, this.charIndex);
   }
 }

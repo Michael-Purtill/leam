@@ -6,17 +6,18 @@ import std.typecons;
 import std.format;
 import std.regex;
 import std.algorithm;
+import std.stdio;
 
 Tuple!(int, Token) scanString(char[] stream, int lineNo, int charNo) {
   int i = 0;
   
   char[] str;
 
-  while (stream[i] == '"' && stream[i] != '\'') {
+  while (stream[i] != '"' && stream[i] != '\'') {
     str ~= stream[i];
     i += 1;
 
-    if (stream[i] == '\n') {
+    if (stream[i] != '\n') {
       charNo += 1;
     } else {
       charNo = 0;
@@ -90,6 +91,7 @@ Token[] scanner(char[] source) {
 
       tokenStream ~= strToken;
       charNo += strToken.charIndex;
+      lineNo = strToken.lineNum;
       i += strTokenLength + 1;
       continue;
     }
@@ -104,7 +106,7 @@ Token[] scanner(char[] source) {
         tokenStream ~= new Token(TokenTypeMap[word], "", lineNo, charNo);
       }
       else {
-        tokenStream ~= new Token(TokenType.ID, "", lineNo, charNo);
+        tokenStream ~= new Token(TokenType.ID, word, lineNo, charNo);
       }
 
       i += word.length; // read the word, then put the index onto the whitespace that is after the word.
@@ -119,8 +121,8 @@ Token[] scanner(char[] source) {
       Token numToken = numTuple[1];
 
       tokenStream ~= numToken;
-      charNo += numTokenLength - 1;
-      i += numTokenLength - 1;
+      charNo += numTokenLength;;
+      i += numTokenLength;
       continue;
     }
 
