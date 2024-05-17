@@ -11,3 +11,13 @@ string peekToWhiteSpace(string stream) {
 
   return res.idup;
 }
+
+int endOfLineIndex(string stream) {
+  int i = 0;
+
+  while (stream[i] != '\n') {
+    i += 1;
+  }
+
+  return i;
+}

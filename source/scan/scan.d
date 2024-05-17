@@ -10,7 +10,7 @@ import std.stdio;
 
 Tuple!(int, Token) scanString(char[] stream, int lineNo, int charNo) {
   int i = 0;
-  
+
   char[] str;
 
   while (stream[i] != '"' && stream[i] != '\'') {
@@ -19,7 +19,8 @@ Tuple!(int, Token) scanString(char[] stream, int lineNo, int charNo) {
 
     if (stream[i] != '\n') {
       charNo += 1;
-    } else {
+    }
+    else {
       charNo = 0;
       lineNo += 1;
     }
@@ -41,13 +42,16 @@ Tuple!(int, Token) scanNumber(char[] stream, int lineNo, int charNo) {
       if (i == 0 || type == TokenType.FLOAT) {
         // we saw a dot before any integer part, or we saw multiple dots in a number
         // i think this is illegal in every langauge we're dealing with but double check
-        throw new Exception("Unexpected token '.', (float values must have an integer part and cannot have multiple .'s)");
-      } else { // we saw a period so we switch to float.
+        throw new Exception(
+          "Unexpected token '.', (float values must have an integer part and cannot have multiple .'s)");
+      }
+      else { // we saw a period so we switch to float.
         type = TokenType.FLOAT;
         number ~= stream[i];
         i += 1;
       }
-    } else {
+    }
+    else {
       number ~= stream[i];
       i += 1;
     }
@@ -78,6 +82,11 @@ Token[] scanner(char[] source) {
       lineNo += 1;
       charNo = 0;
       i += 1;
+      continue;
+    }
+
+    if (ch == '#') {
+      i = i + endOfLineIndex(source[i .. $].idup);
       continue;
     }
 
@@ -121,7 +130,8 @@ Token[] scanner(char[] source) {
       Token numToken = numTuple[1];
 
       tokenStream ~= numToken;
-      charNo += numTokenLength;;
+      charNo += numTokenLength;
+      ;
       i += numTokenLength;
       continue;
     }

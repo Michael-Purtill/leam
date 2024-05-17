@@ -15,6 +15,8 @@ void main()
 
     x = \"this is a test\"
 
+    # this is a comment
+
     test = fn asdf do 
       q = 3
     end

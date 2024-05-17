@@ -22,6 +22,7 @@ enum TokenType {
   END, // do ... end
   IF, // if boolean_expr do .. end else do ... end
   ELSE, // ^
+  HASH, // #, start comment
 
   // StdLib:
   MAP, // map arrvar fn a do ... end
@@ -71,6 +72,7 @@ const TokenType[string] TokenTypeMap = [
   "end": TokenType.END,
   "if": TokenType.IF,
   "else": TokenType.ELSE,
+  "#": TokenType.HASH,
   // Stdlib
   "map": TokenType.MAP,
   "load": TokenType.LOAD,
