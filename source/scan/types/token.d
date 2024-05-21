@@ -8,6 +8,8 @@ enum TokenType {
   SUB, // -
   MUL, // *
   DIV, // /
+  PAREN_LEFT,
+  PAREN_RIGHT,
   EQ, // ==
   LESS, // <,
   LESS_EQ, // <=,
@@ -22,20 +24,29 @@ enum TokenType {
   END, // do ... end
   IF, // if boolean_expr do .. end else do ... end
   ELSE, // ^
+  AND,
+  OR,
+  NOT,
   HASH, // #, start comment
+  APPLY, // apply fn a b c do .. end x y z
 
   // StdLib:
   MAP, // map arrvar fn a do ... end
   LOAD, // obj = load "/path/to/file"
+  WRITE, // write obj #write to the console for consumption by unix util
   TO_JSON, // newobj = tojson obj
   TO_YAML, // toyaml obj
   TO_TOML, // totoml obj
+  KEYS, // keys obj -> ['these', 'are', 'all', 'keys']
+  VALS, // values obj -> ['these', 'are', 'all', 'values']
 
   // Basic data types like strings, numbers
   STRING,
   INT, // 123
   FLOAT, // 123.123
   ID, // variable names, alphanumeric starting with letters, including _
+  TRUE,
+  FALSE,
 
   // Leam's internal data types (which are a lot like javascript's arrays/objects)
   SQUARE_LEFT,
@@ -50,7 +61,10 @@ enum TokenType {
   JSONINIT,
   YAMLINIT,
   TOMLINIT,
-  AUTOINIT // init json, yaml, toml objects respectively, autoinit will do type inference.
+  AUTOINIT, // init json, yaml, toml objects respectively, autoinit will do type inference.
+
+  // End of File
+  EOF
 }
 
 // a helper hashmap to avoid making huge switch statements in the scanner
@@ -60,6 +74,8 @@ const TokenType[string] TokenTypeMap = [
   "-": TokenType.SUB,
   "*": TokenType.MUL,
   "/": TokenType.DIV,
+  "(": TokenType.PAREN_LEFT,
+  ")": TokenType.PAREN_RIGHT,
   "==": TokenType.EQ,
   "<": TokenType.LESS,
   "<=": TokenType.LESS_EQ,
@@ -72,10 +88,17 @@ const TokenType[string] TokenTypeMap = [
   "end": TokenType.END,
   "if": TokenType.IF,
   "else": TokenType.ELSE,
+  "and": TokenType.AND,
+  "or": TokenType.OR,
+  "not": TokenType.NOT,
   "#": TokenType.HASH,
+  "apply": TokenType.APPLY,
   // Stdlib
   "map": TokenType.MAP,
   "load": TokenType.LOAD,
+  "write": TokenType.WRITE,
+  "keys": TokenType.KEYS,
+  "values": TokenType.VALS,
   "tojson": TokenType.TO_JSON,
   "toyaml": TokenType.TO_YAML,
   "totoml": TokenType.TO_TOML,
@@ -92,11 +115,14 @@ const TokenType[string] TokenTypeMap = [
   "yaml": TokenType.YAMLINIT,
   "toml": TokenType.TOMLINIT,
   "auto": TokenType.AUTOINIT,
+  "true": TokenType.TRUE,
+  "false": TokenType.FALSE
 ];
 
-const string[] keywords = [
-  "map", "load", "toyaml", "tojson", "totoml",
-  "json", "yaml", "toml", "auto", "if", "else", "do", "end", "fn"
+const string[] keywords = [ // I wonder if the D compiler is smart enough to turn this into a static array at compile time
+  "map", "load", "write", "toyaml", "tojson", "totoml",
+  "json", "yaml", "toml", "auto", "if", "else", "and", "or", "do", "end", "fn",
+  "keys", "values", "apply", "not"
 ];
 
 class Token {

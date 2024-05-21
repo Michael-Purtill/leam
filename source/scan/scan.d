@@ -131,7 +131,6 @@ Token[] scanner(char[] source) {
 
       tokenStream ~= numToken;
       charNo += numTokenLength;
-      ;
       i += numTokenLength;
       continue;
     }
