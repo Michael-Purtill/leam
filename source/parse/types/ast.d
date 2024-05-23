@@ -24,7 +24,7 @@ class Expr {
     type = t;
   }
 
-  override string toString() {
+  override string toString() const @safe {
     return "";
   }
 }

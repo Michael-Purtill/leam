@@ -139,7 +139,7 @@ class Token {
     this.charIndex = ci;
   }
 
-  override string toString() {
+  override string toString() const @safe{
     return "type:\t\t%s\n
             value:\t\t%s\n
             line:\t\t%d\n

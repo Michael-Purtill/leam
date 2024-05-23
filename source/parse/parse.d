@@ -34,11 +34,11 @@ class Parser {
   }
 
   Expr binaryExprMaker(TokenType[] operatorTypes, Expr delegate() exprParser) {
-    Expr binExpr = exprParser();
+    Expr binExpr = exprParser(); // parse the left side of the expression.
 
-    while (checkTokenType(nextToken(), operatorTypes)) {
+    while (checkTokenType(nextToken(), operatorTypes)) { // check if the next token is one of the operators I'm looking for
       Token operator = incrementToken();
-      Expr right = exprParser();
+      Expr right = exprParser(); // parse the right side of the expression.
 
       Literal empty = "";
 
