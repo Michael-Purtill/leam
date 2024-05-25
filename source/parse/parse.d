@@ -4,6 +4,7 @@ import parse.types.ast;
 import std.typecons;
 import std.algorithm : canFind;
 import std.conv;
+import std.stdio;
 
 class Parser {
   int tokenIndex;
@@ -11,12 +12,16 @@ class Parser {
 
   this(Token[] t) {
     tokens = t;
-    tokenIndex = 0;
+    tokenIndex = -1;
   }
 
   // utils:
 
   Token nextToken() { // look but don't change 
+    if (tokenIndex + 1 >= tokens.length) {
+      return new Token(TokenType.EOF, "", 0, 0);
+    }
+
     return tokens[tokenIndex + 1];
   }
 
@@ -36,6 +41,7 @@ class Parser {
   Expr binaryExprMaker(TokenType[] operatorTypes, Expr delegate() exprParser) {
     Expr binExpr = exprParser(); // parse the left side of the expression.
 
+    
     while (checkTokenType(nextToken(), operatorTypes)) { // check if the next token is one of the operators I'm looking for
       Token operator = incrementToken();
       Expr right = exprParser(); // parse the right side of the expression.
