@@ -1,13 +1,57 @@
 module interpret.interpret;
 import parse.types.ast;
+import scan.types.token : TokenType, Token;
 import std.sumtype;
+import std.conv;
+
+template binCaseGen(string operator) {
+    alias matchOperands = match!(
+        (int l, int r) => returnVal = mixin("r " ~ operator ~ " l"),
+        (float l, float r) => returnVal = mixin("r " ~ operator ~ " l"),
+        (_1, _2) => throw new Exception("INVALID ARITHMETIC OPERATION"));
+}
 
 Literal parseLiteral(Expr expr) {
   return expr.value;
 }
 
 Literal parseBinary(Expr expr) {
-  return expr.value;
+  Expr left = expr.operands[0];
+  Expr right = expr.operands[1];
+
+  Literal leftVal = interpret(left);
+  Literal rightVal = interpret(right);
+  Literal returnVal;
+
+  switch (expr.operator.type) {
+    case TokenType.ADD:
+      mixin binCaseGen!("+");
+      matchOperands(leftVal, rightVal);
+
+      return returnVal;
+      break;
+    case TokenType.SUB:
+      mixin binCaseGen!("-");
+      matchOperands(leftVal, rightVal);
+
+      return returnVal;
+      break;
+    case TokenType.MUL:
+      mixin binCaseGen!("*");
+      matchOperands(leftVal, rightVal);
+
+      return returnVal;
+      break;
+
+    case TokenType.DIV:
+      mixin binCaseGen!("/");
+      matchOperands(leftVal, rightVal);
+
+      return returnVal;
+      break;
+    default:
+      throw new Exception("FAILED TO PARSE BINARY EXPRESSION");
+  }
 }
 
 Literal parseUnary(Expr expr) {
