@@ -12,6 +12,16 @@ template binCaseGen(string operator) {
     (_1, _2) => throw new Exception("INVALID ARITHMETIC OPERATION"));
 }
 
+// special template for +, cos I need to convert to ~ dlang operator for strings
+template binCaseGenAdd(string operator) {
+  alias matchOperands = match!(
+    (int l, int r) => returnVal = mixin("l " ~ operator ~ " r"),
+    (float l, float r) => returnVal = mixin("l " ~ operator ~ " r"),
+    // can't use dlang + operator for strings, need to use ~
+    (string l, string r) => returnVal = mixin("l ~ r"),
+    (_1, _2) => throw new Exception("INVALID ARITHMETIC OPERATION"));
+}
+
 Literal parseLiteral(Expr expr) {
   return expr.value;
 }
@@ -26,7 +36,7 @@ Literal parseBinary(Expr expr) {
 
   switch (expr.operator.type) {
   case TokenType.ADD:
-    mixin binCaseGen!("+");
+    mixin binCaseGenAdd!("+");
     matchOperands(leftVal, rightVal);
     return returnVal;
     break;
