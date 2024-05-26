@@ -112,7 +112,7 @@ Token[] scanner(char[] source) {
       string word = peekToWhiteSpace(source[i .. $].idup);
 
       if (keywords.canFind(word)) {
-        tokenStream ~= new Token(TokenTypeMap[word], "", lineNo, charNo);
+        tokenStream ~= new Token(TokenTypeMap[word], word, lineNo, charNo);
       }
       else {
         tokenStream ~= new Token(TokenType.ID, word, lineNo, charNo);

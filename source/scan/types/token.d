@@ -122,7 +122,7 @@ const TokenType[string] TokenTypeMap = [
 const string[] keywords = [ // I wonder if the D compiler is smart enough to turn this into a static array at compile time
   "map", "load", "write", "toyaml", "tojson", "totoml",
   "json", "yaml", "toml", "auto", "if", "else", "and", "or", "do", "end", "fn",
-  "keys", "values", "apply", "not"
+  "keys", "values", "apply", "not", "true", "false"
 ];
 
 class Token {
