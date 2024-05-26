@@ -72,7 +72,7 @@ Literal parseUnary(Expr expr) {
     );
 
     return retVal;
-  } else {
+  } else if (expr.operator.type == TokenType.NOT) {
     Literal retVal;
 
     value.match!(
@@ -82,6 +82,8 @@ Literal parseUnary(Expr expr) {
 
     return retVal;
   }
+  
+  else throw new Exception("ERROR INTERPRETING UNARY EXPRESSION");
 }
 
 Literal interpret(Expr expr) {
