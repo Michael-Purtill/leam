@@ -68,7 +68,7 @@ Literal parseUnary(Expr expr) {
 
     value.match!(
       (int v) => retVal = -1 * v,
-      (_) => throw new Exception("ILLEGAL UNARY OPERATION: + applied to non-int")
+      (_) => throw new Exception("ILLEGAL UNARY OPERATION: + applied to non-number")
     );
 
     return retVal;
