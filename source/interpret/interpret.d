@@ -83,7 +83,7 @@ Literal parseUnary(Expr expr) {
     return retVal;
   }
   
-  else throw new Exception("ERROR INTERPRETING UNARY EXPRESSION");
+  throw new Exception("ERROR INTERPRETING UNARY EXPRESSION");
 }
 
 Literal interpret(Expr expr) {
