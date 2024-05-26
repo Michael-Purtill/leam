@@ -128,15 +128,11 @@ class Parser {
 
       incrementToken();
 
-      GroupingType gt;
-      ExprType type = gt;
-
-      expr.type = type;
-
       return expr;
     }
 
-    throw new Exception("Expect ')' after expression");
+    throw new Exception("Failed parsing for some reason, here's the token I got stuck on: " 
+      ~ tokens[tokenIndex].toString());
   }
 }
 

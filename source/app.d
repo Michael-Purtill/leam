@@ -8,7 +8,7 @@ import interpret.interpret : interpret;
 void main()
 {
 	string testCode = "
-    16 + 25 * 2.22 - 3 / 2 * 22
+    (25 + 10) * 2
   ";
 
   Token[] tokens = scanner(testCode.dup);
