@@ -62,10 +62,8 @@ Literal parseBinary(Expr expr) {
 
 Literal parseUnary(Expr expr) {
   Literal value = interpret(expr.operands[0]);
-
+  Literal retVal;
   if (expr.operator.type == TokenType.SUB) {
-    Literal retVal;
-
     value.match!(
       (int v) => retVal = -1 * v,
       (_) => throw new Exception("ILLEGAL UNARY OPERATION: + applied to non-number")
@@ -73,8 +71,6 @@ Literal parseUnary(Expr expr) {
 
     return retVal;
   } else if (expr.operator.type == TokenType.NOT) {
-    Literal retVal;
-
     value.match!(
       (bool v) => retVal = !v,
       (_) => throw new Exception("ILLEGAL UNARY OPERATION: `not` applied to non-bool")
