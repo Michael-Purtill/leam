@@ -3,11 +3,10 @@ import std.sumtype;
 import scan.types.token : Token;
 
 struct BinaryType {} // i + j, 1 + 3 - 2
-struct GroupingType {} // (i + j)
 struct LiteralType {} // 2, "string example"
 struct UnaryType {} // -1, -3, not (x == 2)
 
-alias ExprType = SumType!(BinaryType, GroupingType, LiteralType, UnaryType);
+alias ExprType = SumType!(BinaryType, LiteralType, UnaryType);
 
 alias Literal = SumType!(string, int, float, bool);
 
