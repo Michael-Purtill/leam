@@ -77,7 +77,7 @@ Literal parseUnary(Expr expr) {
 
     value.match!(
       (bool v) => retVal = !v,
-      (_) => throw new Exception("ILLEGAL UNARY OPERATION: ! applied to non-bool")
+      (_) => throw new Exception("ILLEGAL UNARY OPERATION: `not` applied to non-bool")
     );
 
     return retVal;
