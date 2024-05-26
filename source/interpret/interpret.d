@@ -61,7 +61,27 @@ Literal parseBinary(Expr expr) {
 }
 
 Literal parseUnary(Expr expr) {
-  return expr.value;
+  Literal value = interpret(expr.operands[0]);
+
+  if (expr.operator.type == TokenType.SUB) {
+    Literal retVal;
+
+    value.match!(
+      (int v) => retVal = -1 * v,
+      (_) => throw new Exception("ILLEGAL UNARY OPERATION: + applied to non-int")
+    );
+
+    return retVal;
+  } else {
+    Literal retVal;
+
+    value.match!(
+      (bool v) => retVal = !v,
+      (_) => throw new Exception("ILLEGAL UNARY OPERATION: ! applied to non-bool")
+    );
+
+    return retVal;
+  }
 }
 
 Literal interpret(Expr expr) {
