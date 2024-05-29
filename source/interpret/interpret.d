@@ -16,8 +16,7 @@ template binCaseGen(string operator) {
 template binCaseGenAdd(string operator) {
   alias matchOperands = match!(
     (int l, int r) => returnVal = mixin("l " ~ operator ~ " r"),
-    (float l, float r) => returnVal = mixin("l " ~ operator ~ " r"),
-    // can't use dlang + operator for strings, need to use ~
+    (float l, float r) => returnVal = mixin("l " ~ operator ~ " r"), // can't use dlang + operator for strings, need to use ~
     (string l, string r) => returnVal = mixin("l ~ r"),
     (_1, _2) => throw new Exception("INVALID ARITHMETIC OPERATION"));
 }
@@ -33,6 +32,8 @@ Literal parseBinary(Expr expr) {
   Literal leftVal = interpret(left);
   Literal rightVal = interpret(right);
   Literal returnVal;
+
+  writeln("hi!");
 
   switch (expr.operator.type) {
   case TokenType.ADD:
@@ -55,6 +56,18 @@ Literal parseBinary(Expr expr) {
     matchOperands(leftVal, rightVal);
     return returnVal;
     break;
+  case TokenType.AND:
+    mixin binCaseGen!("||");
+    writeln("hi!");
+    matchOperands(leftVal, rightVal);
+    return returnVal;
+    break;
+  case TokenType.OR:
+    mixin binCaseGen!("&&");
+    writeln(leftVal);
+    matchOperands(leftVal, rightVal);
+    return returnVal;
+    break;
   default:
     throw new Exception("FAILED TO PARSE BINARY EXPRESSION");
   }
@@ -70,7 +83,8 @@ Literal parseUnary(Expr expr) {
     );
 
     return retVal;
-  } else if (expr.operator.type == TokenType.NOT) {
+  }
+  else if (expr.operator.type == TokenType.NOT) {
     value.match!(
       (bool v) => retVal = !v,
       (_) => throw new Exception("ILLEGAL UNARY OPERATION: `not` applied to non-bool")
@@ -78,12 +92,14 @@ Literal parseUnary(Expr expr) {
 
     return retVal;
   }
-  
+
   throw new Exception("ERROR INTERPRETING UNARY EXPRESSION");
 }
 
 Literal interpret(Expr expr) {
   ExprType type = expr.type;
+
+  writeln(type);
 
   return type.match!(
     (LiteralType _) => parseLiteral(expr),

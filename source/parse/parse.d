@@ -41,7 +41,6 @@ class Parser {
   Expr binaryExprMaker(TokenType[] operatorTypes, Expr delegate() exprParser) {
     Expr binExpr = exprParser(); // parse the left side of the expression.
 
-    
     while (checkTokenType(nextToken(), operatorTypes)) { // check if the next token is one of the operators I'm looking for
       Token operator = incrementToken();
       Expr right = exprParser(); // parse the right side of the expression.
@@ -63,7 +62,9 @@ class Parser {
   }
 
   Expr parseComparison() {
-    return binaryExprMaker([TokenType.GREATER, TokenType.GREATER_EQ, TokenType.LESS, TokenType.LESS_EQ], &parseTerm);
+    return binaryExprMaker([
+      TokenType.GREATER, TokenType.GREATER_EQ, TokenType.LESS, TokenType.LESS_EQ
+    ], &parseTerm);
   }
 
   Expr parseTerm() {
@@ -100,10 +101,12 @@ class Parser {
       return new Expr(null, [], val, type);
     }
 
-    if (checkTokenType(nextToken(), [TokenType.STRING, TokenType.INT, TokenType.FLOAT])) {
+    if (checkTokenType(nextToken(), [
+          TokenType.STRING, TokenType.INT, TokenType.FLOAT
+        ])) {
       Token valToken = incrementToken();
       Literal val = valToken.value;
-      
+
       if (valToken.type == TokenType.INT) {
         val = to!int(valToken.value);
       }
@@ -131,8 +134,8 @@ class Parser {
       return expr;
     }
 
-    throw new Exception("Failed parsing for some reason, here's the token I got stuck on: " 
-      ~ tokens[tokenIndex].toString());
+    throw new Exception(
+      "Failed parsing for some reason, here's the token I got stuck on: "
+        ~ tokens[tokenIndex].toString());
   }
 }
-

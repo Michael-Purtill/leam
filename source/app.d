@@ -8,7 +8,7 @@ import interpret.interpret : interpret;
 void main()
 {
 	string testCode = "
-    not false and false
+    false or true
   ";
 
   Token[] tokens = scanner(testCode.dup);
