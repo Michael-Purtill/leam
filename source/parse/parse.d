@@ -34,7 +34,19 @@ class Parser {
     return types.canFind(token.type);
   }
 
-  Expr parse() {
+  Expr[] parse() {
+    Expr[] res = [];
+    while (nextToken().type != TokenType.EOF) {
+      res ~= subParse();
+      while (tokens[tokenIndex].type == TokenType.NEWLINE) {
+        incrementToken();
+      }
+    }
+
+    return res;
+  }
+
+  Expr subParse() {
     return parseEquality();
   }
 
@@ -133,6 +145,8 @@ class Parser {
 
       return expr;
     }
+
+
 
     throw new Exception(
       "Failed parsing for some reason, here's the token I got stuck on: "

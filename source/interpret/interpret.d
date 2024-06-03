@@ -33,8 +33,6 @@ Literal parseBinary(Expr expr) {
   Literal rightVal = interpret(right);
   Literal returnVal;
 
-  writeln("hi!");
-
   switch (expr.operator.type) {
   case TokenType.ADD:
     mixin binCaseGenAdd!("+");
@@ -58,13 +56,11 @@ Literal parseBinary(Expr expr) {
     break;
   case TokenType.AND:
     mixin binCaseGen!("||");
-    writeln("hi!");
     matchOperands(leftVal, rightVal);
     return returnVal;
     break;
   case TokenType.OR:
     mixin binCaseGen!("&&");
-    writeln(leftVal);
     matchOperands(leftVal, rightVal);
     return returnVal;
     break;
@@ -98,8 +94,6 @@ Literal parseUnary(Expr expr) {
 
 Literal interpret(Expr expr) {
   ExprType type = expr.type;
-
-  writeln(type);
 
   return type.match!(
     (LiteralType _) => parseLiteral(expr),
