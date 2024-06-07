@@ -63,6 +63,7 @@ enum TokenType {
   TOMLINIT,
   AUTOINIT, // init json, yaml, toml objects respectively, autoinit will do type inference.
 
+  NEWLINE,
   // End of File
   EOF
 }

@@ -8,14 +8,22 @@ import interpret.interpret : interpret;
 void main()
 {
 	string testCode = "
-    false or true
+    2 + 2
+    
+    3 + 3
   ";
 
   Token[] tokens = scanner(testCode.dup);
 
-  Expr ast = new Parser(tokens).parse();
+  Expr[] statements = new Parser(tokens).parse();
 
-  writeln(interpret(ast));
+  foreach (Expr statement; statements) {
+    writeln(interpret(statement));
+  }
+
+  // Expr ast = new Parser(tokens).parse();
+
+  // writeln(interpret(ast));
 
   return;
 }
