@@ -8,9 +8,12 @@ import interpret.interpret : interpret;
 void main()
 {
 	string testCode = "
-    2 + 2
-    
-    3 + 3
+    true and true
+    true or true
+    false and false
+    false or false
+    true and false
+    true or false
   ";
 
   Token[] tokens = scanner(testCode.dup);

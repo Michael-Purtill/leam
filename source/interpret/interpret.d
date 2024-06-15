@@ -55,12 +55,12 @@ Literal parseBinary(Expr expr) {
     return returnVal;
     break;
   case TokenType.AND:
-    mixin binCaseGen!("||");
+    mixin binCaseGen!("&&");
     matchOperands(leftVal, rightVal);
     return returnVal;
     break;
   case TokenType.OR:
-    mixin binCaseGen!("&&");
+    mixin binCaseGen!("||");
     matchOperands(leftVal, rightVal);
     return returnVal;
     break;

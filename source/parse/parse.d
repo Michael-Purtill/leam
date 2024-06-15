@@ -47,7 +47,7 @@ class Parser {
   }
 
   Expr subParse() {
-    return parseEquality();
+    return parseLogical();
   }
 
   Expr binaryExprMaker(TokenType[] operatorTypes, Expr delegate() exprParser) {
@@ -67,6 +67,10 @@ class Parser {
     }
 
     return binExpr;
+  }
+
+  Expr parseLogical() {
+    return binaryExprMaker([TokenType.AND, TokenType.OR], &parseEquality);
   }
 
   Expr parseEquality() {
