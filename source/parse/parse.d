@@ -108,6 +108,35 @@ class Parser {
     return parsePrimary();
   }
 
+  Expr parseID() {
+    if (checkTokenType(nextToken(), [TokenType.ID])) {
+      Token id = incrementToken();
+
+      IDType idType;
+
+      ExprType type = idType;
+
+      return new Expr(null, [], id.value, type);
+    }
+  }
+
+  Expr parseAssignment() {
+    Expr left = parseID();
+
+    if (checkTokenType(nextToken(), [TokenType.ASSIGN])) {
+      Token operator = incrementToken();
+      Expr right = parseLogical();
+
+      Literal empty = "";
+
+      BinaryType binType;
+
+      ExprType type = binType;
+
+      binExpr = new Expr(operator, [left, right], empty, type);
+    }
+  }
+
   Expr parsePrimary() {
     if (checkTokenType(nextToken(), [TokenType.TRUE, TokenType.FALSE])) {
       Token boolToken = incrementToken();
@@ -150,10 +179,17 @@ class Parser {
       return expr;
     }
 
-
+    if (checkTokenType(nextToken(), [TokenType.ID])) {
+      if (tokens[tokenIndex + 2].type == TokenType.ASSIGN) {
+        return parseAssignment();
+      } else {
+        return parseID();
+      }
+    }
 
     throw new Exception(
       "Failed parsing for some reason, here's the token I got stuck on: "
         ~ tokens[tokenIndex].toString());
   }
+  
 }

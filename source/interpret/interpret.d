@@ -21,11 +21,11 @@ template binCaseGenAdd(string operator) {
     (_1, _2) => throw new Exception("INVALID ARITHMETIC OPERATION"));
 }
 
-Literal parseLiteral(Expr expr) {
+Literal evanLiteral(Expr expr) {
   return expr.value;
 }
 
-Literal parseBinary(Expr expr) {
+Literal evalBinary(Expr expr) {
   Expr left = expr.operands[0];
   Expr right = expr.operands[1];
 
@@ -69,7 +69,7 @@ Literal parseBinary(Expr expr) {
   }
 }
 
-Literal parseUnary(Expr expr) {
+Literal evalUnary(Expr expr) {
   Literal value = interpret(expr.operands[0]);
   Literal retVal;
   if (expr.operator.type == TokenType.SUB) {
@@ -92,12 +92,23 @@ Literal parseUnary(Expr expr) {
   throw new Exception("ERROR INTERPRETING UNARY EXPRESSION");
 }
 
+Literal evalID(Expr expr) {
+  
+}
+
+Literal evalAssignment(Expr expr) {
+
+}
+
 Literal interpret(Expr expr) {
   ExprType type = expr.type;
 
   return type.match!(
-    (LiteralType _) => parseLiteral(expr),
-    (BinaryType _) => parseBinary(expr),
-    (UnaryType _) => parseUnary(expr)
+    (LiteralType _) => evanLiteral(expr),
+    (BinaryType _) => evalBinary(expr),
+    (UnaryType _) => evalUnary(expr),
+    (IDType _) => evalID(expr),
+    (AssignmentType _) => evalAssignment(expr)
+
   );
 }

@@ -4,14 +4,13 @@ import scan.types.token : Token;
 import std.format;
 import std.conv;
 
-struct BinaryType {
-} // i + j, 1 + 3 - 2
-struct LiteralType {
-} // 2, "string example"
-struct UnaryType {
-} // -1, -3, not (x == 2)
+struct BinaryType;  // i + j, 1 + 3 - 2
+struct LiteralType; // 2, "string example"
+struct UnaryType;   // -1, -3, not (x == 2)
+struct AssignmentType; // id = 234
+struct IDType; // id, varName
 
-alias ExprType = SumType!(BinaryType, LiteralType, UnaryType);
+alias ExprType = SumType!(BinaryType, LiteralType, UnaryType, IDType, AssignmentType);
 
 alias Literal = SumType!(string, int, float, bool);
 
