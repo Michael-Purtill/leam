@@ -5,6 +5,7 @@ import std.typecons;
 import std.algorithm : canFind;
 import std.conv;
 import std.stdio;
+import std.format;
 
 class Parser {
   int tokenIndex;
@@ -47,7 +48,7 @@ class Parser {
   }
 
   Expr subParse() {
-    return parseEquality();
+    return parseLogical();
   }
 
   Expr binaryExprMaker(TokenType[] operatorTypes, Expr delegate() exprParser) {
@@ -67,6 +68,10 @@ class Parser {
     }
 
     return binExpr;
+  }
+
+  Expr parseLogical() {
+    return binaryExprMaker([TokenType.AND, TokenType.OR], &parseEquality);
   }
 
   Expr parseEquality() {
@@ -102,6 +107,41 @@ class Parser {
     }
 
     return parsePrimary();
+  }
+
+  Expr parseID() {
+    if (checkTokenType(nextToken(), [TokenType.ID])) {
+      Token id = incrementToken();
+
+      IDType idType;
+
+      ExprType type = idType;
+
+      Literal val = id.value;
+
+      return new Expr(null, [], val, type);
+    }
+
+    throw new Exception("Failed to parse identifier. Failed on token %".format(nextToken()));
+  }
+
+  Expr parseAssignment() {
+    Expr assignment = parseID();
+
+    if (checkTokenType(nextToken(), [TokenType.ASSIGN])) {
+      Token operator = incrementToken();
+      Expr right = parseLogical();
+
+      Literal empty = "";
+
+      AssignmentType assignType;
+
+      ExprType type = assignType;
+
+      assignment = new Expr(operator, [assignment, right], empty, type);
+    }
+
+    return assignment;
   }
 
   Expr parsePrimary() {
@@ -146,10 +186,13 @@ class Parser {
       return expr;
     }
 
-
+    if (checkTokenType(nextToken(), [TokenType.ID])) {
+      return parseAssignment();
+    }
 
     throw new Exception(
       "Failed parsing for some reason, here's the token I got stuck on: "
         ~ tokens[tokenIndex].toString());
   }
+  
 }
