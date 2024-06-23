@@ -22,7 +22,18 @@ template binCaseGenAdd(string operator) {
 }
 
 class Evaluator {
-  Literal[string] symbolTable = []; // you evaluate expressions and add them to symbol tables
+  Literal[string] symbolTable = null; // you evaluate expressions and add them to symbol tables
+  Expr[] statements;
+
+  this(Expr[] stmts) {
+    statements = stmts;
+  }
+
+  void evaluate() {
+    foreach (Expr statement; statements) {
+      writeln(interpret(statement));
+    }
+  }
 
   Literal interpret(Expr expr) {
     ExprType type = expr.type;
@@ -109,13 +120,13 @@ class Evaluator {
   }
 
   Literal evalID(Expr expr) {
-    return symbolTable[expr.value];
+    return symbolTable[to!string(expr.value)];
   }
 
   Literal evalAssignment(Expr expr) {
     Expr right = expr.operands[1];
     Literal rightVal = interpret(right);
-    symbolTable[expr.operands[0].value] = rightVal;
+    symbolTable[to!string(expr.operands[0].value)] = rightVal;
 
     return rightVal;
   }

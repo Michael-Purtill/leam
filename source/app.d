@@ -3,30 +3,23 @@ import scan.scan;
 import scan.types.token;
 import parse.parse;
 import parse.types.ast;
-import interpret.interpret : interpret;
+import interpret.interpret;
 
 void main()
 {
 	string testCode = "
-    true and true
-    true or true
-    false and false
-    false or false
-    true and false
-    true or false
+    x = 10 * 2
+    y = x * 2
+    y
   ";
 
   Token[] tokens = scanner(testCode.dup);
 
   Expr[] statements = new Parser(tokens).parse();
 
-  foreach (Expr statement; statements) {
-    writeln(interpret(statement));
-  }
+  Evaluator evaluator = new Evaluator(statements);
 
-  // Expr ast = new Parser(tokens).parse();
-
-  // writeln(interpret(ast));
+  evaluator.evaluate();
 
   return;
 }

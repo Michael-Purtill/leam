@@ -5,6 +5,7 @@ import std.typecons;
 import std.algorithm : canFind;
 import std.conv;
 import std.stdio;
+import std.format;
 
 class Parser {
   int tokenIndex;
@@ -116,12 +117,16 @@ class Parser {
 
       ExprType type = idType;
 
-      return new Expr(null, [], id.value, type);
+      Literal val = id.value;
+
+      return new Expr(null, [], val, type);
     }
+
+    throw new Exception("Failed to parse identifier. Failed on token %".format(nextToken()));
   }
 
   Expr parseAssignment() {
-    Expr left = parseID();
+    Expr assignment = parseID();
 
     if (checkTokenType(nextToken(), [TokenType.ASSIGN])) {
       Token operator = incrementToken();
@@ -129,12 +134,14 @@ class Parser {
 
       Literal empty = "";
 
-      BinaryType binType;
+      AssignmentType assignType;
 
-      ExprType type = binType;
+      ExprType type = assignType;
 
-      binExpr = new Expr(operator, [left, right], empty, type);
+      assignment = new Expr(operator, [assignment, right], empty, type);
     }
+
+    return assignment;
   }
 
   Expr parsePrimary() {
@@ -180,11 +187,7 @@ class Parser {
     }
 
     if (checkTokenType(nextToken(), [TokenType.ID])) {
-      if (tokens[tokenIndex + 2].type == TokenType.ASSIGN) {
-        return parseAssignment();
-      } else {
-        return parseID();
-      }
+      return parseAssignment();
     }
 
     throw new Exception(

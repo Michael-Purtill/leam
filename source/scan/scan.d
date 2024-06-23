@@ -41,7 +41,7 @@ Tuple!(int, Token) scanNumber(char[] stream, int lineNo, int charNo) {
     if (stream[i] == '.') {
       if (i == 0 || type == TokenType.FLOAT) {
         // we saw a dot before any integer part, or we saw multiple dots in a number
-        // i think this is illegal in every langauge we're dealing with but double check
+        // i think this is illegal in every language we're dealing with but double check
         throw new Exception(
           "Unexpected token '.', (float values must have an integer part and cannot have multiple .'s)");
       }
