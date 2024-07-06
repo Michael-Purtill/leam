@@ -91,6 +91,31 @@ class Evaluator {
       matchOperands(leftVal, rightVal);
       return returnVal;
       break;
+    case TokenType.GREATER:
+      mixin binCaseGen!(">");
+      matchOperands(leftVal, rightVal);
+      return returnVal;
+      break;
+    case TokenType.GREATER_EQ:
+      mixin binCaseGen!(">=");
+      matchOperands(leftVal, rightVal);
+      return returnVal;
+      break;
+    case TokenType.LESS:
+      mixin binCaseGen!("<");
+      matchOperands(leftVal, rightVal);
+      return returnVal;
+      break;
+    case TokenType.LESS_EQ:
+      mixin binCaseGen!("<=");
+      matchOperands(leftVal, rightVal);
+      return returnVal;
+      break;
+    case TokenType.EQ:
+      mixin binCaseGen!("==");
+      matchOperands(leftVal, rightVal);
+      return returnVal;
+      break;
     default:
       throw new Exception("FAILED TO PARSE BINARY EXPRESSION");
     }
