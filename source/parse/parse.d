@@ -39,7 +39,6 @@ class Parser {
     Expr[] res = [];
     while (nextToken().type != TokenType.EOF) {
       res ~= subParse();
-      writeln(res);
       while (tokens[tokenIndex].type == TokenType.NEWLINE) {
         incrementToken();
       }
