@@ -191,7 +191,7 @@ class Parser {
     }
 
     throw new Exception(
-      "Failed parsing for some reason, here's the token I got stuck on: "
+      "Failed parsing for some reason, here's the token I got stuck on:\n "
         ~ tokens[tokenIndex].toString());
   }
   

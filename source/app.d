@@ -8,9 +8,8 @@ import interpret.interpret;
 void main()
 {
 	string testCode = "
-    x = 10 * 2
-    y = x * 2
-    y
+    x = 2
+    x >= 3
   ";
 
   Token[] tokens = scanner(testCode.dup);
