@@ -27,6 +27,10 @@ class Expr {
     type = t;
   }
 
+  this() { // empty constructor so that lambda doesn't generate an error.
+
+  }
+
   override string toString() const @safe {
     if (operands.length == 0) {
       return value.to!string;

@@ -1,6 +1,7 @@
 module parse.parse;
 import scan.types.token : Token, TokenType;
 import parse.types.ast;
+import parse.types.lambda;
 import std.typecons;
 import std.algorithm : canFind;
 import std.conv;
@@ -17,7 +18,6 @@ class Parser {
   }
 
   // utils:
-
   Token nextToken() { // look but don't change 
     if (tokenIndex + 1 >= tokens.length) {
       return new Token(TokenType.EOF, "", 0, 0);
@@ -49,6 +49,41 @@ class Parser {
 
   Expr subParse() {
     return parseLogical();
+  }
+
+  Expr parseLambda() {
+    if (checkTokenType(nextToken(), [TokenType.FN])) {
+      incrementToken(); // consume the fn keyword
+
+      Token[] lambdaParameters = null; // optional array of parameters
+
+      while (checkTokenType(nextToken(), [TokenType.ID])) {
+        lambdaParameters ~= incrementToken();
+      }
+
+      // generate an array of tokens for the lambda block
+      Token[] lambdaBlockTokens = null;
+      int doEndBalance = 0; // balance count for do (+1) and end (-1) to handle nested do/end blocks. value of 0 means balanced, so break out of loop
+
+      do { // use do while block to start loop even though doEndBalance starts at 0.
+        Token currentToken = tokens[tokenIndex];
+
+        if (checkTokenType(currentToken, [TokenType.DO])) {
+          doEndBalance += 1;
+        } else if (checkTokenType(currentToken, [TokenType.END])) {
+          doEndBalance -= 1;
+        }
+
+        lambdaBlockTokens ~= currentToken;
+
+        incrementToken();
+      } while(doEndBalance != 0);
+
+      return new Lambda(lambdaParameters, lambdaBlockTokens);
+
+    } else {
+      return parseLogical();
+    }
   }
 
   Expr binaryExprMaker(TokenType[] operatorTypes, Expr delegate() exprParser) {
