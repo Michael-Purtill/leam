@@ -8,17 +8,20 @@ import interpret.interpret;
 void main()
 {
 	string testCode = "
-    x = 2
-    x >= 3
+    fn x y z do 2 + 2 end
   ";
 
   Token[] tokens = scanner(testCode.dup);
 
   Expr[] statements = new Parser(tokens).parse();
 
-  Evaluator evaluator = new Evaluator(statements);
+  foreach (Expr key; statements) {
+    writeln(key);
+  }
 
-  evaluator.evaluate();
+  // Evaluator evaluator = new Evaluator(statements);
+
+  // evaluator.evaluate();
 
   return;
 }
