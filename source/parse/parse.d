@@ -2,6 +2,7 @@ module parse.parse;
 import scan.types.token : Token, TokenType;
 import parse.types.ast;
 import parse.types.lambda;
+import parse.types.apply;
 import std.typecons;
 import std.algorithm : canFind;
 import std.conv;
@@ -66,23 +67,40 @@ class Parser {
       int doEndBalance = 0; // balance count for do (+1) and end (-1) to handle nested do/end blocks. value of 0 means balanced, so break out of loop
 
       do { // use do while block to start loop even though doEndBalance starts at 0.
-        Token currentToken = tokens[tokenIndex];
+        Token currentToken = incrementToken();
 
         if (checkTokenType(currentToken, [TokenType.DO])) {
           doEndBalance += 1;
-        } else if (checkTokenType(currentToken, [TokenType.END])) {
+        }
+        else if (checkTokenType(currentToken, [TokenType.END])) {
           doEndBalance -= 1;
         }
 
         lambdaBlockTokens ~= currentToken;
+      }
+      while (doEndBalance != 0);
 
-        incrementToken();
-      } while(doEndBalance != 0);
+      return new Lambda(lambdaParameters, lambdaBlockTokens[1 .. lambdaBlockTokens.length - 1]); // slice 1..-1 to remove redundant `do` and `while` keywords
 
-      return new Lambda(lambdaParameters, lambdaBlockTokens);
+    }
+    else {
+      return subParse();
+    }
+  }
 
+  Expr parseApply() {
+    if (checkTokenType(nextToken(), [TokenType.APPLY])) {
+      incrementToken();
+      Lambda lambda = parseLambda();
+      Token[] arguments = null;
+
+      foreach (Token t; lambda.parameters) {
+        arguments ~= incrementToken();
+      }
+
+      return new Apply(lambda, arguments);
     } else {
-      return parseLogical();
+      return subParse();
     }
   }
 
@@ -165,7 +183,7 @@ class Parser {
 
     if (checkTokenType(nextToken(), [TokenType.ASSIGN])) {
       Token operator = incrementToken();
-      Expr right = parseLogical();
+      Expr right = subParse();
 
       Literal empty = "";
 
@@ -210,7 +228,7 @@ class Parser {
     if (checkTokenType(nextToken(), [TokenType.PAREN_LEFT])) {
       incrementToken();
 
-      Expr expr = parseEquality();
+      Expr expr = subParse();
 
       if (!checkTokenType(nextToken(), [TokenType.PAREN_RIGHT])) {
         throw new Exception("Expect ')' after expression");
@@ -225,9 +243,17 @@ class Parser {
       return parseAssignment();
     }
 
+    if (checkTokenType(nextToken(), [TokenType.FN])) {
+      parseLambda();
+    }
+
+    if (checkTokenType(nextToken(), [TokenType.APPLY])) {
+      parseApply();
+    }
+
     throw new Exception(
       "Failed parsing for some reason, here's the token I got stuck on:\n "
         ~ tokens[tokenIndex].toString());
   }
-  
+
 }

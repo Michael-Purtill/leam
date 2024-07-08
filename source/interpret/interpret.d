@@ -44,7 +44,7 @@ class Evaluator {
       (UnaryType _) => evalUnary(expr),
       (IDType _) => evalID(expr),
       (AssignmentType _) => evalAssignment(expr)
-
+      
     );
   }
 

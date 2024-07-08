@@ -4,13 +4,20 @@ import scan.types.token : Token;
 import std.format;
 import std.conv;
 
-struct BinaryType {}  // i + j, 1 + 3 - 2
-struct LiteralType {} // 2, "string example"
-struct UnaryType {}   // -1, -3, not (x == 2)
-struct AssignmentType {} // id = 234
-struct IDType {} // id, varName
+struct BinaryType {
+} // i + j, 1 + 3 - 2
+struct LiteralType {
+} // 2, "string example"
+struct UnaryType {
+} // -1, -3, not (x == 2)
+struct AssignmentType {
+} // id = 234
+struct IDType {
+} // id, varName
+struct LambdaType {
+} // fn x do x * x end
 
-alias ExprType = SumType!(BinaryType, LiteralType, UnaryType, IDType, AssignmentType);
+alias ExprType = SumType!(BinaryType, LiteralType, UnaryType, IDType, AssignmentType, LambdaType);
 
 alias Literal = SumType!(string, int, float, bool);
 
@@ -27,8 +34,8 @@ class Expr {
     type = t;
   }
 
-  this() { // empty constructor so that lambda doesn't generate an error.
-
+  this() {
+    // empty constructor so that Lambda doesn't generate an error.
   }
 
   override string toString() const @safe {

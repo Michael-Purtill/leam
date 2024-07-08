@@ -3,6 +3,7 @@ import parse.types.ast;
 import scan.types.token;
 import parse.parse;
 import std.array;
+import std.stdio;
 
 class Lambda : Expr {
   Expr[] exprs;
@@ -11,6 +12,9 @@ class Lambda : Expr {
   this(Token[] params, Token[] code) {
     parameters = params;
     exprs = (new Parser(code)).parse();
+
+    LambdaType typeVar;
+    type = typeVar;
   }
 
   override string toString() const @safe {
