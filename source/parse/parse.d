@@ -52,7 +52,7 @@ class Parser {
     return parseLogical();
   }
 
-  Expr parseLambda() {
+  Lambda parseLambda() {
     if (checkTokenType(nextToken(), [TokenType.FN])) {
       incrementToken(); // consume the fn keyword
 
@@ -84,7 +84,7 @@ class Parser {
 
     }
     else {
-      return subParse();
+      return to!Lambda(subParse());
     }
   }
 
@@ -244,11 +244,11 @@ class Parser {
     }
 
     if (checkTokenType(nextToken(), [TokenType.FN])) {
-      parseLambda();
+      return parseLambda();
     }
 
     if (checkTokenType(nextToken(), [TokenType.APPLY])) {
-      parseApply();
+      return parseApply();
     }
 
     throw new Exception(

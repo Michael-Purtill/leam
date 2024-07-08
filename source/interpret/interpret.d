@@ -39,16 +39,16 @@ class Evaluator {
     ExprType type = expr.type;
 
     return type.match!(
-      (LiteralType _) => evanLiteral(expr),
+      (LiteralType _) => evalLiteral(expr),
       (BinaryType _) => evalBinary(expr),
       (UnaryType _) => evalUnary(expr),
       (IDType _) => evalID(expr),
-      (AssignmentType _) => evalAssignment(expr)
-      
+      (AssignmentType _) => evalAssignment(expr),
+      (LambdaType _) => evalLambda(expr)
     );
   }
 
-  Literal evanLiteral(Expr expr) {
+  Literal evalLiteral(Expr expr) {
     return expr.value;
   }
 
@@ -154,5 +154,13 @@ class Evaluator {
     symbolTable[to!string(expr.operands[0].value)] = rightVal;
 
     return rightVal;
+  }
+
+  Literal evalLambda(Expr _expr) {
+    // dummy value/return to get this to compile, gonna need to figure out a way to represent unevaluated functions as literals.
+    Literal dummyVal;
+    dummyVal = 1;
+
+    return dummyVal;
   }
 }
