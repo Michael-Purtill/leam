@@ -12,7 +12,7 @@ struct IDType {} // id, varName
 
 alias ExprType = SumType!(BinaryType, LiteralType, UnaryType, IDType, AssignmentType);
 
-alias Literal = SumType!(string, int, float, bool);
+alias Literal = SumType!(string, int, float, bool, Lambda);
 
 class Expr {
   Token operator;
@@ -41,4 +41,11 @@ class Expr {
       operands[0].toString,
       operands[1].toString);
   }
+}
+
+class Lambda {
+  Token[string] params; 
+  Expr[] arguments;
+  Expr bodyExpr;
+  
 }

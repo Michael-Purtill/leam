@@ -39,7 +39,7 @@ class Evaluator {
     ExprType type = expr.type;
 
     return type.match!(
-      (LiteralType _) => evanLiteral(expr),
+      (LiteralType _) => evalLiteral(expr),
       (BinaryType _) => evalBinary(expr),
       (UnaryType _) => evalUnary(expr),
       (IDType _) => evalID(expr),
@@ -48,7 +48,7 @@ class Evaluator {
     );
   }
 
-  Literal evanLiteral(Expr expr) {
+  Literal evalLiteral(Expr expr) {
     return expr.value;
   }
 
