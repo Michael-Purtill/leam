@@ -29,10 +29,31 @@ class Evaluator {
     statements = stmts;
   }
 
+  this(Expr[] stmts, Literal[string] syms) { // provide a copy of parent scope symbol table for evaluating lambda applications.
+    statements = statements;
+    symbolTable = syms;
+  }
+
   void evaluate() {
     foreach (Expr statement; statements) {
       writeln(interpret(statement));
     }
+  }
+
+  Literal evalReturn() {
+    Literal retVal;
+    foreach (Expr statement; statements) {
+      retVal = interpret(statement);
+    }
+    return retVal;
+  }
+
+  Literal[] evalReturnArr() {
+    Literal[] retVals = null;
+    foreach (Expr statement; statements) {
+      retVals ~= interpret(statement);
+    }
+    return retVals;
   }
 
   Literal interpret(Expr expr) {
@@ -43,8 +64,9 @@ class Evaluator {
       (BinaryType _) => evalBinary(expr),
       (UnaryType _) => evalUnary(expr),
       (IDType _) => evalID(expr),
-      (AssignmentType _) => evalAssignment(expr)
-
+      (AssignmentType _) => evalAssignment(expr),
+      (LambdaType _) => evalLiteral(expr), // lambda expressions evaluate to themselves.
+      (ApplyType _) => evalApply(expr)
     );
   }
 
@@ -156,7 +178,30 @@ class Evaluator {
     return rightVal;
   }
 
-  Literal evalLambda(Expr expr) {
-    return expr.value; // lambda expression evaluates to its lambda literal value.
+  Literal evalApply(Expr expr) {
+    return expr.value.match!(
+      (Apply a) { 
+        Literal[] paramVals = new Evaluator(a.params).evalReturnArr(); 
+        Literal[string] newSymTable = symbolTable.dup();
+
+        Token[] lambdaParams = a.lambda.value.match!(
+          (Lambda l) => l.params,
+          (_) => throw new Exception("INVALID LAMBDA")
+        );
+
+        foreach (i, Token t; lambdaParams) {
+          newSymTable[t.value] = paramVals[i];
+        }
+
+        return a.lambda.value.match!(
+          (Lambda l) => new Evaluator(l.bodyExprs, newSymTable).evalReturn(),
+          (_) => throw new Exception("INVALID LAMBDA")
+        );
+      },
+      (_) => throw new Exception("INVALID APPLICATION")
+    );
+
+    // Evaluator lambdaEval = new 
   }
+
 }
