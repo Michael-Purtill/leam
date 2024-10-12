@@ -155,4 +155,8 @@ class Evaluator {
 
     return rightVal;
   }
+
+  Literal evalLambda(Expr expr) {
+    return expr.value; // lambda expression evaluates to its lambda literal value.
+  }
 }

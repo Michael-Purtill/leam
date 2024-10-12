@@ -51,6 +51,56 @@ class Parser {
     return parseLogical();
   }
 
+  Expr parseLambda() {
+    if (checkTokenType(nextToken(), [TokenType.FN])) { // saw the start of a lambda value.
+      incrementToken(); // consume fn keyword.
+
+      Token[] params = null;
+
+      // look for params and add them to params array if they exist.
+      while (checkTokenType(nextToken(), [TokenType.ID])) {
+        params ~= incrementToken();
+      }
+
+      Token[] lambdaBodyTokens = null;
+
+      int doEndBalance = 0;
+
+      do {
+        if (checkTokenType(nextToken(), [TokenType.DO])) {
+          doEndBalance +=1;
+          lambdaBodyTokens ~= incrementToken();
+        }
+        else if (checkTokenType(nextToken(), [TokenType.END])) {
+          doEndBalance -= 1;
+          lambdaBodyTokens ~= incrementToken();
+        } else {
+          lambdaBodyTokens ~= incrementToken();
+        }
+      } while (doEndBalance != 0);
+
+      lambdaBodyTokens = lambdaBodyTokens[1 .. lambdaBodyTokens.length - 1]; // get rid of redundant do end keywords bookending the array.
+
+      // construct the lambda literal expr:
+
+      // step 1: make an expr out of the lambda body tokens:
+      Expr[] lambdaBody = new Parser(lambdaBodyTokens).parse();
+
+      // step 2: create lamda literal with params and body:
+      Lambda func = new Lambda(params, lambdaBody);
+
+      // step 3: build the Expr which holds the lambda literal.
+      LambdaType lambdaType;
+
+      ExprType type = lambdaType;
+
+      Expr lambdaExpr = new Expr(null, [], func, type);
+
+      return lambdaExpr;
+
+    }
+  }
+
   Expr binaryExprMaker(TokenType[] operatorTypes, Expr delegate() exprParser) {
     Expr binExpr = exprParser(); // parse the left side of the expression.
 

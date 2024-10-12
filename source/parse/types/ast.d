@@ -9,8 +9,9 @@ struct LiteralType {} // 2, "string example"
 struct UnaryType {}   // -1, -3, not (x == 2)
 struct AssignmentType {} // id = 234
 struct IDType {} // id, varName
+struct LambdaType {} // fn x y z do x + y + z end
 
-alias ExprType = SumType!(BinaryType, LiteralType, UnaryType, IDType, AssignmentType);
+alias ExprType = SumType!(BinaryType, LiteralType, UnaryType, IDType, AssignmentType, LambdaType);
 
 alias Literal = SumType!(string, int, float, bool, Lambda);
 
@@ -44,8 +45,13 @@ class Expr {
 }
 
 class Lambda {
-  Token[string] params; 
-  Expr[] arguments;
-  Expr bodyExpr;
+  Token[] params; 
+  // Expr[] arguments;
+  Expr[] bodyExprs;
+
+  this(Token[] p, Expr[] e) {
+    params = p;
+    bodyExprs = e;
+  }
   
 }
