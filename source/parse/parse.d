@@ -38,7 +38,7 @@ class Parser {
   Expr[] parse() {
     Expr[] res = [];
     while (nextToken().type != TokenType.EOF) {
-      res ~= subParse();
+      res ~= enterParse();
       while (tokens[tokenIndex].type == TokenType.NEWLINE) {
         incrementToken();
       }
@@ -47,7 +47,7 @@ class Parser {
     return res;
   }
 
-  Expr subParse() {
+  Expr enterParse() {
     return parseLogical();
   }
 
@@ -68,21 +68,22 @@ class Parser {
 
       do {
         if (checkTokenType(nextToken(), [TokenType.DO])) {
-          doEndBalance +=1;
+          doEndBalance += 1;
           lambdaBodyTokens ~= incrementToken();
         }
         else if (checkTokenType(nextToken(), [TokenType.END])) {
           doEndBalance -= 1;
           lambdaBodyTokens ~= incrementToken();
-        } else {
+        }
+        else {
           lambdaBodyTokens ~= incrementToken();
         }
-      } while (doEndBalance != 0);
+      }
+      while (doEndBalance != 0);
 
       lambdaBodyTokens = lambdaBodyTokens[1 .. lambdaBodyTokens.length - 1]; // get rid of redundant do end keywords bookending the array.
 
       // construct the lambda literal expr:
-
       // step 1: make an expr out of the lambda body tokens:
       Expr[] lambdaBody = new Parser(lambdaBodyTokens).parse();
 
@@ -97,7 +98,33 @@ class Parser {
       Expr lambdaExpr = new Expr(null, [], func, type);
 
       return lambdaExpr;
+    }
+    else {
+      return enterParse();
+    }
+  }
 
+  Expr parseApply() {
+    if (checkTokenType(nextToken(), [TokenType.APPLY])) {
+      incrementToken(); // don't store apply keyword.
+      Expr lambda = parseLambda(); // parse the lambda expression
+      Expr[] arguments = null; //arguments are exprs evaluated at runtime.
+
+      foreach (Token t; lambda.value.params) { // build array of arguments
+        arguments ~= enterParse();
+      }
+
+      ApplyType applyType;
+
+      ExprType type = applyType;
+
+      Expr applyExpr = new Expr(null, [], lambda, applyType);
+
+      return applyExpr;
+
+    }
+    else {
+      return enterParse();
     }
   }
 
@@ -180,7 +207,7 @@ class Parser {
 
     if (checkTokenType(nextToken(), [TokenType.ASSIGN])) {
       Token operator = incrementToken();
-      Expr right = parseLogical();
+      Expr right = enterParse();
 
       Literal empty = "";
 
@@ -240,9 +267,17 @@ class Parser {
       return parseAssignment();
     }
 
+    if (checkTokenType(nextToken(), [TokenType.FN])) {
+      return parseLambda();
+    }
+
+    if (checkTokenType(nextToken(), [TokenType.APPLY])) {
+      return parseApply();
+    }
+
     throw new Exception(
       "Failed parsing for some reason, here's the token I got stuck on:\n "
         ~ tokens[tokenIndex].toString());
   }
-  
+
 }

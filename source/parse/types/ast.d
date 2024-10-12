@@ -10,10 +10,11 @@ struct UnaryType {}   // -1, -3, not (x == 2)
 struct AssignmentType {} // id = 234
 struct IDType {} // id, varName
 struct LambdaType {} // fn x y z do x + y + z end
+struct ApplyType {} // apply fn x y z do x + y + z end 1 2 3
 
-alias ExprType = SumType!(BinaryType, LiteralType, UnaryType, IDType, AssignmentType, LambdaType);
+alias ExprType = SumType!(BinaryType, LiteralType, UnaryType, IDType, AssignmentType, LambdaType, ApplyType);
 
-alias Literal = SumType!(string, int, float, bool, Lambda);
+alias Literal = SumType!(string, int, float, bool, Lambda, Apply);
 
 class Expr {
   Token operator;
@@ -54,4 +55,14 @@ class Lambda {
     bodyExprs = e;
   }
   
+}
+
+class Apply {
+  Expr lambda;
+  Expr[] params;
+
+  this(Expr l, Expr[] p) {
+    lambda = l;
+    params = p;
+  }
 }
