@@ -29,26 +29,50 @@ class Evaluator {
     statements = stmts;
   }
 
+  this(Expr[] stmts, Literal[string] syms) { // provide a copy of parent scope symbol table for evaluating lambda applications.
+    statements = stmts;
+    symbolTable = syms;
+  }
+
   void evaluate() {
     foreach (Expr statement; statements) {
       writeln(interpret(statement));
     }
   }
 
+  Literal evalReturn() {
+    Literal retVal;
+
+    foreach (Expr statement; statements) {
+      retVal = interpret(statement);
+    }
+
+    return retVal;
+  }
+
+  Literal[] evalReturnArr() {
+    Literal[] retVals = null;
+    foreach (Expr statement; statements) {
+      retVals ~= interpret(statement);
+    }
+    return retVals;
+  }
+
   Literal interpret(Expr expr) {
     ExprType type = expr.type;
 
     return type.match!(
-      (LiteralType _) => evanLiteral(expr),
+      (LiteralType _) => evalLiteral(expr),
       (BinaryType _) => evalBinary(expr),
       (UnaryType _) => evalUnary(expr),
       (IDType _) => evalID(expr),
-      (AssignmentType _) => evalAssignment(expr)
-
+      (AssignmentType _) => evalAssignment(expr),
+      (LambdaType _) => evalLiteral(expr), // lambda expressions evaluate to themselves.
+      (ApplyType _) => evalApply(expr)
     );
   }
 
-  Literal evanLiteral(Expr expr) {
+  Literal evalLiteral(Expr expr) {
     return expr.value;
   }
 
@@ -155,4 +179,31 @@ class Evaluator {
 
     return rightVal;
   }
+
+  Literal evalApply(Expr expr) {
+    return expr.value.match!(
+      (Apply a) { 
+        Literal[] paramVals = new Evaluator(a.params).evalReturnArr(); 
+        Literal[string] newSymTable = symbolTable.dup();
+
+        Token[] lambdaParams = a.lambda.value.match!(
+          (Lambda l) => l.params,
+          (_) => throw new Exception("INVALID LAMBDA")
+        );
+
+        foreach (i, Token t; lambdaParams) {
+          newSymTable[t.value] = paramVals[i];
+        }
+
+        return a.lambda.value.match!(
+          (Lambda l) {
+            return (new Evaluator(l.bodyExprs, newSymTable)).evalReturn();
+          },
+          (_) => throw new Exception("INVALID LAMBDA")
+        );
+      },
+      (_) => throw new Exception("INVALID APPLICATION")
+    );
+  }
+
 }

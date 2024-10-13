@@ -8,8 +8,7 @@ import interpret.interpret;
 void main()
 {
 	string testCode = "
-    x = 2
-    x >= 3
+    apply fn x do x + x end 12
   ";
 
   Token[] tokens = scanner(testCode.dup);

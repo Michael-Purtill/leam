@@ -1,6 +1,8 @@
 module scan.types.token;
 import std.format;
 import std.conv;
+import std.algorithm;
+import std.array;
 
 enum TokenType {
   // Arithmetic and Logic
@@ -120,6 +122,10 @@ const TokenType[string] TokenTypeMap = [
   "true": TokenType.TRUE,
   "false": TokenType.FALSE
 ];
+
+// auto TypeTokenMap = reduce!((string[const(TokenType)] acc, k) => acc ~ [TokenTypeMap[k]: k])([], TokenTypeMap.keys());
+
+// auto TypeTokenMap = TokenTypeMap.keys().map!(k => [TokenTypeMap[k]: k]).reduce!((acc, m) => [
 
 const string[] keywords = [ // I wonder if the D compiler is smart enough to turn this into a static array at compile time
   "map", "load", "write", "toyaml", "tojson", "totoml",

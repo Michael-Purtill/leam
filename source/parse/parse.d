@@ -6,6 +6,7 @@ import std.algorithm : canFind;
 import std.conv;
 import std.stdio;
 import std.format;
+import std.sumtype;
 
 class Parser {
   int tokenIndex;
@@ -38,7 +39,7 @@ class Parser {
   Expr[] parse() {
     Expr[] res = [];
     while (nextToken().type != TokenType.EOF) {
-      res ~= subParse();
+      res ~= enterParse();
       while (tokens[tokenIndex].type == TokenType.NEWLINE) {
         incrementToken();
       }
@@ -47,8 +48,103 @@ class Parser {
     return res;
   }
 
-  Expr subParse() {
+  Expr enterParse() {
     return parseLogical();
+  }
+
+  Expr parseLambda() {
+    if (checkTokenType(nextToken(), [TokenType.FN])) { // saw the start of a lambda value.
+      incrementToken(); // consume fn keyword.
+
+      Token[] params = null;
+
+      // look for params and add them to params array if they exist.
+      while (checkTokenType(nextToken(), [TokenType.ID])) {
+        params ~= incrementToken();
+      }
+
+      Token[] lambdaBodyTokens = null;
+
+      int doEndBalance = 0;
+
+      do {
+        if (checkTokenType(nextToken(), [TokenType.DO])) {
+          doEndBalance += 1;
+          lambdaBodyTokens ~= incrementToken();
+        }
+        else if (checkTokenType(nextToken(), [TokenType.END])) {
+          doEndBalance -= 1;
+          lambdaBodyTokens ~= incrementToken();
+        }
+        else {
+          lambdaBodyTokens ~= incrementToken();
+        }
+      }
+      while (doEndBalance != 0);
+
+      lambdaBodyTokens = lambdaBodyTokens[1 .. lambdaBodyTokens.length - 1]; // get rid of redundant do end keywords bookending the array.
+
+      // construct the lambda literal expr:
+      // step 1: make an expr out of the lambda body tokens:
+      Expr[] lambdaBody = new Parser(lambdaBodyTokens).parse();
+
+      // step 2: create lamda literal with params and body:
+      Lambda func = new Lambda(params, lambdaBody);
+
+      // step 3: build the Expr which holds the lambda literal.
+      LambdaType lambdaType;
+
+      ExprType type = lambdaType;
+
+      Literal funcLiteral = func;
+
+      Expr lambdaExpr = new Expr(null, [], funcLiteral, type);
+
+      return lambdaExpr;
+    }
+    else {
+      return enterParse();
+    }
+  }
+
+  Expr parseApply() {
+    if (checkTokenType(nextToken(), [TokenType.APPLY])) {
+      incrementToken(); // don't store apply keyword.
+      Expr l = parseLambda(); // parse the lambda expression
+      Expr[] arguments = null; //arguments are exprs evaluated at runtime.
+
+      Lambda lambda = l.value.match!(
+        (Lambda lm) => lm,
+        (_) => throw new Exception("ERROR PARSING LAMBDA")
+      );
+
+      foreach (Token t; lambda.params) { // build array of arguments
+        arguments ~= enterParse();
+      }
+
+      // construct the lambda expression:
+      Literal lambdaLiteral = lambda;
+
+      LambdaType lambdaType;
+
+      ExprType ltype = lambdaType;
+
+      Expr lambdaExpr = new Expr(null, [], lambdaLiteral, ltype);
+
+      // construct the apply expression:
+      ApplyType applyType;
+
+      ExprType atype = applyType;   
+
+      Literal applyLiteral = new Apply(lambdaExpr, arguments);
+
+      Expr applyExpr = new Expr(null, [], applyLiteral, atype);
+
+      return applyExpr;
+    }
+    else {
+      return enterParse();
+    }
   }
 
   Expr binaryExprMaker(TokenType[] operatorTypes, Expr delegate() exprParser) {
@@ -130,7 +226,7 @@ class Parser {
 
     if (checkTokenType(nextToken(), [TokenType.ASSIGN])) {
       Token operator = incrementToken();
-      Expr right = parseLogical();
+      Expr right = enterParse();
 
       Literal empty = "";
 
@@ -190,9 +286,17 @@ class Parser {
       return parseAssignment();
     }
 
+    if (checkTokenType(nextToken(), [TokenType.FN])) {
+      return parseLambda();
+    }
+
+    if (checkTokenType(nextToken(), [TokenType.APPLY])) {
+      return parseApply();
+    }
+
     throw new Exception(
       "Failed parsing for some reason, here's the token I got stuck on:\n "
         ~ tokens[tokenIndex].toString());
   }
-  
+
 }

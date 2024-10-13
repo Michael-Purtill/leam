@@ -9,10 +9,12 @@ struct LiteralType {} // 2, "string example"
 struct UnaryType {}   // -1, -3, not (x == 2)
 struct AssignmentType {} // id = 234
 struct IDType {} // id, varName
+struct LambdaType {} // fn x y z do x + y + z end
+struct ApplyType {} // apply fn x y z do x + y + z end 1 2 3
 
-alias ExprType = SumType!(BinaryType, LiteralType, UnaryType, IDType, AssignmentType);
+alias ExprType = SumType!(BinaryType, LiteralType, UnaryType, IDType, AssignmentType, LambdaType, ApplyType);
 
-alias Literal = SumType!(string, int, float, bool);
+alias Literal = SumType!(string, int, float, bool, Lambda, Apply);
 
 class Expr {
   Token operator;
@@ -40,5 +42,57 @@ class Expr {
       operator.toString,
       operands[0].toString,
       operands[1].toString);
+  }
+}
+
+class Lambda {
+  Token[] params; 
+  // Expr[] arguments;
+  Expr[] bodyExprs;
+
+  this(Token[] p, Expr[] e) {
+    params = p;
+    bodyExprs = e;
+  }
+
+  override string toString() const @safe {
+    char[] str = "Params:\n".dup;
+
+    foreach (const Token t; params) {
+      str ~= t.toString() ~ " ".dup;
+    }
+
+    str ~= "Exprs:\n".dup;
+
+    foreach (const Expr e; bodyExprs) {
+      str ~= e.toString() ~ " ".dup;
+    }
+
+    return str.idup;
+  }
+  
+}
+
+class Apply {
+  Expr lambda;
+  Expr[] params;
+
+  this(Expr l, Expr[] p) {
+    lambda = l;
+    params = p;
+  }
+
+  override string toString() const @safe {
+    char[] str = "Arguments:\n".dup;
+
+    foreach (const Expr p; params) {
+      str ~= p.toString() ~ " ".dup;
+    }
+
+    str ~= "Lambda:\n".dup;
+
+    str ~= lambda.toString();
+
+    return str.idup;
   }
 }
