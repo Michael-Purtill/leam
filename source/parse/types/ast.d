@@ -54,6 +54,22 @@ class Lambda {
     params = p;
     bodyExprs = e;
   }
+
+  override string toString() const @safe {
+    char[] str = "Params:\n".dup;
+
+    foreach (const Token t; params) {
+      str ~= t.toString() ~ " ".dup;
+    }
+
+    str ~= "Exprs:\n".dup;
+
+    foreach (const Expr e; bodyExprs) {
+      str ~= e.toString() ~ " ".dup;
+    }
+
+    return str.idup;
+  }
   
 }
 
@@ -64,5 +80,19 @@ class Apply {
   this(Expr l, Expr[] p) {
     lambda = l;
     params = p;
+  }
+
+  override string toString() const @safe {
+    char[] str = "Arguments:\n".dup;
+
+    foreach (const Expr p; params) {
+      str ~= p.toString() ~ " ".dup;
+    }
+
+    str ~= "Lambda:\n".dup;
+
+    str ~= lambda.toString();
+
+    return str.idup;
   }
 }

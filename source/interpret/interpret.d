@@ -30,7 +30,7 @@ class Evaluator {
   }
 
   this(Expr[] stmts, Literal[string] syms) { // provide a copy of parent scope symbol table for evaluating lambda applications.
-    statements = statements;
+    statements = stmts;
     symbolTable = syms;
   }
 
@@ -42,9 +42,11 @@ class Evaluator {
 
   Literal evalReturn() {
     Literal retVal;
+
     foreach (Expr statement; statements) {
       retVal = interpret(statement);
     }
+
     return retVal;
   }
 
@@ -194,14 +196,14 @@ class Evaluator {
         }
 
         return a.lambda.value.match!(
-          (Lambda l) => new Evaluator(l.bodyExprs, newSymTable).evalReturn(),
+          (Lambda l) {
+            return (new Evaluator(l.bodyExprs, newSymTable)).evalReturn();
+          },
           (_) => throw new Exception("INVALID LAMBDA")
         );
       },
       (_) => throw new Exception("INVALID APPLICATION")
     );
-
-    // Evaluator lambdaEval = new 
   }
 
 }

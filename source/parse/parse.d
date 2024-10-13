@@ -6,6 +6,7 @@ import std.algorithm : canFind;
 import std.conv;
 import std.stdio;
 import std.format;
+import std.sumtype;
 
 class Parser {
   int tokenIndex;
@@ -95,7 +96,9 @@ class Parser {
 
       ExprType type = lambdaType;
 
-      Expr lambdaExpr = new Expr(null, [], func, type);
+      Literal funcLiteral = func;
+
+      Expr lambdaExpr = new Expr(null, [], funcLiteral, type);
 
       return lambdaExpr;
     }
@@ -107,21 +110,37 @@ class Parser {
   Expr parseApply() {
     if (checkTokenType(nextToken(), [TokenType.APPLY])) {
       incrementToken(); // don't store apply keyword.
-      Expr lambda = parseLambda(); // parse the lambda expression
+      Expr l = parseLambda(); // parse the lambda expression
       Expr[] arguments = null; //arguments are exprs evaluated at runtime.
 
-      foreach (Token t; lambda.value.params) { // build array of arguments
+      Lambda lambda = l.value.match!(
+        (Lambda lm) => lm,
+        (_) => throw new Exception("ERROR PARSING LAMBDA")
+      );
+
+      foreach (Token t; lambda.params) { // build array of arguments
         arguments ~= enterParse();
       }
 
+      // construct the lambda expression:
+      Literal lambdaLiteral = lambda;
+
+      LambdaType lambdaType;
+
+      ExprType ltype = lambdaType;
+
+      Expr lambdaExpr = new Expr(null, [], lambdaLiteral, ltype);
+
+      // construct the apply expression:
       ApplyType applyType;
 
-      ExprType type = applyType;
+      ExprType atype = applyType;   
 
-      Expr applyExpr = new Expr(null, [], lambda, applyType);
+      Literal applyLiteral = new Apply(lambdaExpr, arguments);
+
+      Expr applyExpr = new Expr(null, [], applyLiteral, atype);
 
       return applyExpr;
-
     }
     else {
       return enterParse();
