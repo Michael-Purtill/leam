@@ -11,6 +11,7 @@ import std.sumtype;
 class Parser {
   int tokenIndex;
   Token[] tokens;
+  Expr[string] assignments; // need to make application of lambda variables work.
 
   this(Token[] t) {
     tokens = t;
@@ -110,6 +111,23 @@ class Parser {
   Expr parseApply() {
     if (checkTokenType(nextToken(), [TokenType.APPLY])) {
       incrementToken(); // don't store apply keyword.
+      if (checkTokenType(nextToken(), [TokenType.ID])) { 
+        Expr id = parseID();
+        Expr[] arguments = null;
+
+        Expr l = assignments[id.value];
+
+        foreach (Token t; lambda.params) { // build array of arguments
+        arguments ~= enterParse();
+      }
+
+      }
+      //   do something
+      // } else if (next token is id) {
+      //   do something else
+      // }
+
+      
       Expr l = parseLambda(); // parse the lambda expression
       Expr[] arguments = null; //arguments are exprs evaluated at runtime.
 
@@ -236,6 +254,8 @@ class Parser {
 
       assignment = new Expr(operator, [assignment, right], empty, type);
     }
+
+    assignments[assignment.operands[0].value] = assignment;
 
     return assignment;
   }
