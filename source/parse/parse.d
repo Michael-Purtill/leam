@@ -111,21 +111,27 @@ class Parser {
   Expr parseApply() {
     if (checkTokenType(nextToken(), [TokenType.APPLY])) {
       incrementToken(); // don't store apply keyword.
-      if (checkTokenType(nextToken(), [TokenType.ID])) { 
+      if (checkTokenType(nextToken(), [TokenType.ID])) { // dealing with a lambda variable
         Expr id = parseID();
         Expr[] arguments = null;
 
-        Expr l = assignments[id.value];
+        string varName = id.value.match!(
+          (string name) => name,
+          (_) => throw new Exception("TRIED TO ACCESS VARIABLE NAME WITH NON-STRING WHEN APPLYING LAMBDA VARIABLE")
+        );
+
+        Expr l = assignments[varName];
+
+        Lambda lambda = l.value.match!(
+        (Lambda lm) => lm,
+        (_) => throw new Exception("ERROR PARSING LAMBDA")
+      );
 
         foreach (Token t; lambda.params) { // build array of arguments
         arguments ~= enterParse();
       }
 
       }
-      //   do something
-      // } else if (next token is id) {
-      //   do something else
-      // }
 
       
       Expr l = parseLambda(); // parse the lambda expression
@@ -243,19 +249,27 @@ class Parser {
     Expr assignment = parseID();
 
     if (checkTokenType(nextToken(), [TokenType.ASSIGN])) {
+      writeln("step1");
       Token operator = incrementToken();
+      writeln(operator);
       Expr right = enterParse();
-
+      writeln("step2");
       Literal empty = "";
 
       AssignmentType assignType;
 
       ExprType type = assignType;
-
+      writeln("step3");
       assignment = new Expr(operator, [assignment, right], empty, type);
+      writeln("step4");
     }
 
-    assignments[assignment.operands[0].value] = assignment;
+    string varName = assignment.operands[0].value.match!(
+      (string name) => name,
+      (_) => throw new Exception("TRIED TO STORE VARIABLE WITH NON-STRING INDEX")
+    );
+
+    assignments[varName] = assignment;
 
     return assignment;
   }
