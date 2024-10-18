@@ -33,13 +33,21 @@ class Parser {
     return tokens[tokenIndex];
   }
 
+  Token incrementTokenN(int n) { // look and change.
+    tokenIndex += n;
+    return tokens[tokenIndex];
+  }
+
   bool checkTokenType(Token token, TokenType[] types) {
     return types.canFind(token.type);
   }
 
   Expr[] parse() {
-    Expr[] res = [];
+    Expr[] res = null;
     while (nextToken().type != TokenType.EOF) {
+      if (tokens.length == 3) {
+        writeln("wtf");
+      }
       res ~= enterParse();
       while (tokens[tokenIndex].type == TokenType.NEWLINE) {
         incrementToken();
@@ -91,7 +99,7 @@ class Parser {
 
       // step 2: create lamda literal with params and body:
       Lambda func = new Lambda(params, lambdaBody);
-
+      
       // step 3: build the Expr which holds the lambda literal.
       LambdaType lambdaType;
 
@@ -104,7 +112,7 @@ class Parser {
       return lambdaExpr;
     }
     else {
-      return enterParse();
+      throw new Exception("TRIED TO PARSE LAMBDA BUT FN KEYWORD NOT FOUND");
     }
   }
 
@@ -123,17 +131,34 @@ class Parser {
         Expr l = assignments[varName];
 
         Lambda lambda = l.value.match!(
-        (Lambda lm) => lm,
-        (_) => throw new Exception("ERROR PARSING LAMBDA")
-      );
+          (Lambda lm) => lm,
+          (_) => throw new Exception("ERROR PARSING LAMBDA")
+        );
 
         foreach (Token t; lambda.params) { // build array of arguments
-        arguments ~= enterParse();
+          arguments ~= enterParse();
+        }
+
+        Literal lambdaLiteral = lambda;
+
+        LambdaType lambdaType;
+
+        ExprType ltype = lambdaType;
+
+        Expr lambdaExpr = new Expr(null, [], lambdaLiteral, ltype);
+
+        // construct the apply expression:
+        ApplyType applyType;
+
+        ExprType atype = applyType;
+
+        Literal applyLiteral = new Apply(lambdaExpr, arguments);
+
+        Expr applyExpr = new Expr(null, [], applyLiteral, atype);
+
+        return applyExpr;
       }
 
-      }
-
-      
       Expr l = parseLambda(); // parse the lambda expression
       Expr[] arguments = null; //arguments are exprs evaluated at runtime.
 
@@ -167,7 +192,7 @@ class Parser {
       return applyExpr;
     }
     else {
-      return enterParse();
+      throw new Exception("TRIED APPLYING WITH NO APPLY");
     }
   }
 
@@ -223,7 +248,6 @@ class Parser {
       ExprType type = uType;
 
       return new Expr(operator, [right], empty, type);
-
     }
 
     return parsePrimary();
@@ -249,9 +273,7 @@ class Parser {
     Expr assignment = parseID();
 
     if (checkTokenType(nextToken(), [TokenType.ASSIGN])) {
-      writeln("step1");
       Token operator = incrementToken();
-      writeln(operator);
       Expr right = enterParse();
       writeln("step2");
       Literal empty = "";
@@ -262,15 +284,15 @@ class Parser {
       writeln("step3");
       assignment = new Expr(operator, [assignment, right], empty, type);
       writeln("step4");
+
+      string varName = assignment.operands[0].value.match!(
+        (string name) => name,
+        (_) => throw new Exception("TRIED TO STORE VARIABLE WITH NON-STRING INDEX")
+      );
+
+      assignments[varName] = assignment;
     }
-
-    string varName = assignment.operands[0].value.match!(
-      (string name) => name,
-      (_) => throw new Exception("TRIED TO STORE VARIABLE WITH NON-STRING INDEX")
-    );
-
-    assignments[varName] = assignment;
-
+    
     return assignment;
   }
 
