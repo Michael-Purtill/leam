@@ -45,9 +45,6 @@ class Parser {
   Expr[] parse() {
     Expr[] res = null;
     while (nextToken().type != TokenType.EOF) {
-      if (tokens.length == 3) {
-        writeln("wtf");
-      }
       res ~= enterParse();
       while (tokens[tokenIndex].type == TokenType.NEWLINE) {
         incrementToken();
@@ -275,22 +272,18 @@ class Parser {
     if (checkTokenType(nextToken(), [TokenType.ASSIGN])) {
       Token operator = incrementToken();
       Expr right = enterParse();
-      writeln("step2");
       Literal empty = "";
-
       AssignmentType assignType;
-
       ExprType type = assignType;
-      writeln("step3");
+
       assignment = new Expr(operator, [assignment, right], empty, type);
-      writeln("step4");
 
       string varName = assignment.operands[0].value.match!(
         (string name) => name,
         (_) => throw new Exception("TRIED TO STORE VARIABLE WITH NON-STRING INDEX")
       );
 
-      assignments[varName] = assignment;
+      assignments[varName] = assignment.operands[1];
     }
     
     return assignment;
